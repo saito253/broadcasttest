@@ -31,8 +31,7 @@ public class MainActivity extends Activity {
         super.onResume();
 
         mPreview.openCamera();
-
-        mServer.start(10080);
+        mServer.start(8080);
     }
 
     @Override

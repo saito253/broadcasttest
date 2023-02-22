@@ -12,7 +12,7 @@ public class MJpegServer implements Runnable {
 
     private Thread mLooper;
 
-    private int mPort = 10080;
+    private int mPort = 8080;
 
     private final String CRLF = "\r\n";
 

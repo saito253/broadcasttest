@@ -15,6 +15,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import android.graphics.*;
+import android.graphics.Bitmap.Config;
+
 public class CameraPreview  extends ViewGroup implements SurfaceHolder.Callback {
 
     private Camera mCamera;
@@ -93,7 +96,6 @@ public class CameraPreview  extends ViewGroup implements SurfaceHolder.Callback 
                 previewWidth = mPreviewSize.width;
                 previewHeight = mPreviewSize.height;
             }
-
             // Center the child SurfaceView within the parent.
             if (width * previewHeight > height * previewWidth) {
                 final int scaledChildWidth = previewWidth * height / previewHeight;
@@ -134,9 +136,11 @@ public class CameraPreview  extends ViewGroup implements SurfaceHolder.Callback 
 
             mPreviewFormat = parameters.getPreviewFormat();
             mSupportedPreviewSizes = parameters.getSupportedPreviewSizes();
-
             if (mPreviewSize == null) {
                 mPreviewSize = mSupportedPreviewSizes.get(0);
+                //mPreviewSize.width=1280;
+                //mPreviewSize.height=720;
+                System.out.println("DEBUG:"+mPreviewSize.width+","+mPreviewSize.height);
                 parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
             } else {
                 boolean found = false;
@@ -226,16 +230,18 @@ public class CameraPreview  extends ViewGroup implements SurfaceHolder.Callback 
         mCamera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
             @Override
             public void onPreviewFrame(byte[] data, Camera camera) {
+                long start = System.currentTimeMillis();
                 if (mEventListener != null){
                     //
                     // JPEG圧縮データ
                     byte[] jpegData = convertYuv2Jpeg(data, mPreviewFormat, mPreviewSize.width, mPreviewSize.height);
-
                     if (jpegData != null) {
                         mEventListener.OnFrame(jpegData);
                     }
                 }
                 mCamera.addCallbackBuffer(mFrameBuffer);
+                long end = System.currentTimeMillis();
+                System.out.println("DEBUG:::::::::::::::::::"+"MyApplication,"+"performance " + (end - start) + " msec");
             }
         });
     }
@@ -254,7 +260,22 @@ public class CameraPreview  extends ViewGroup implements SurfaceHolder.Callback 
                 YuvImage yuvimage = new YuvImage(yuvData, format, w, h, null);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 yuvimage.compressToJpeg(new Rect(0, 0, w, h), 70, baos);
-                jpegData = baos.toByteArray();
+
+                byte[] imageBytes = baos.toByteArray();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+                // rotate/*  ww w  . j  a  v  a  2  s  .  c om*/
+                Matrix matrix = new Matrix();
+                matrix.postRotate(180);
+                Bitmap dst = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+                ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+                dst.compress(Bitmap.CompressFormat.JPEG, 100, baos2);
+
+                jpegData = baos2.toByteArray();
+                baos2.close();
+
+                //jpegData = baos.toByteArray();
                 baos.close();
             }
             catch (Exception e) {
