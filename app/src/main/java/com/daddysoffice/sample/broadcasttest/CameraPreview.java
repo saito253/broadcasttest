@@ -241,7 +241,7 @@ public class CameraPreview  extends ViewGroup implements SurfaceHolder.Callback 
                 }
                 mCamera.addCallbackBuffer(mFrameBuffer);
                 long end = System.currentTimeMillis();
-                System.out.println("DEBUG:::::::::::::::::::"+"MyApplication,"+"performance " + (end - start) + " msec");
+                System.out.println("DEBUG:"+"MyApplication,"+"performance " + (end - start) + " msec");
             }
         });
     }
