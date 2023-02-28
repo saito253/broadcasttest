@@ -15,4 +15,6 @@ $ adb am start com.daddysoffice.sample.broadcasttest/.PermissionConfirmActivity
 $ adb am force-stop com.daddysoffice.sample.broadcasttest
 ```
 ## Usage
+```
 http://xxx.xxx.xxx.xxx:8080/
+```
